@@ -4,34 +4,7 @@ on:
       - main
 name: Release
 jobs:
-  release-staging:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pull-requests: write
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2.2.3
-        with:
-          version: 8
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-          registry-url: https://registry.npmjs.org/
-          cache: 'pnpm'
-      - name: Install
-        run: pnpm install
-      - name: Build
-        run: pnpm build
-      - name: Deploy to Cloudflare
-        uses: cloudflare/wrangler-action@2.0.0
-        with:
-          apiToken: ${{ secrets.CF_TOKEN }}
-          environment: 'carpark-staging'
-  release-production:
+  release:
     runs-on: ubuntu-latest
     permissions:
       contents: write
