@@ -1,0 +1,61 @@
+{
+  "name": "@web3-storage/public-bucket",
+  "version": "0.0.0",
+  "description": "Server implementation of a bucket with multipart range support.",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc --build",
+    "lint": "standard",
+    "pretest": "npm run lint",
+    "test": "entail",
+    "coverage": "c8 --reporter text --reporter html npm run test"
+  },
+  "author": "Alan Shaw",
+  "license": "Apache-2.0 OR MIT",
+  "files": [
+    "src",
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "import": "./src/index.js",
+      "types": "./dist/src/index.d.ts"
+    },
+    "./server": {
+      "import": "./src/server.js",
+      "types": "./dist/src/server.d.ts"
+    },
+    "./server/node": {
+      "import": "./src/server.node.js",
+      "types": "./dist/src/server.node.d.ts"
+    }
+  },
+  "dependencies": {
+    "@httpland/range-parser": "^1.2.0",
+    "multipart-byte-range": "^2.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.12",
+    "buffer": "^6.0.3",
+    "byteranges": "^1.1.0",
+    "c8": "^9.1.0",
+    "entail": "^2.1.2",
+    "standard": "^17.1.0",
+    "typescript": "^5.4.5",
+    "uint8arrays": "^5.1.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/w3s-project/public-bucket.git"
+  },
+  "bugs": {
+    "url": "https://github.com/w3s-project/public-bucket/issues"
+  },
+  "homepage": "https://github.com/w3s-project/public-bucket#readme",
+  "standard": {
+    "ignore": [
+      "*.ts"
+    ]
+  }
+}
