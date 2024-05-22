@@ -33,12 +33,11 @@
   },
   "dependencies": {
     "@httpland/range-parser": "^1.2.0",
-    "multipart-byte-range": "^2.0.2"
+    "multipart-byte-range": "^3.0.1"
   },
   "devDependencies": {
     "@types/node": "^20.12.12",
     "buffer": "^6.0.3",
-    "byteranges": "^1.1.0",
     "c8": "^9.1.0",
     "entail": "^2.1.2",
     "standard": "^17.1.0",

@@ -1,7 +1,6 @@
 import http from 'node:http'
 import { equals } from 'uint8arrays'
-import { Buffer } from 'buffer'
-import * as ByteRanges from 'byteranges'
+import { MultipartByteRangeDecoder, getBoundary, decodePartHeader } from 'multipart-byte-range'
 import { MemoryBucket } from '../src/bucket.js'
 import * as Server from '../src/server.node.js'
 
@@ -82,18 +81,26 @@ export const test = {
       headers: { Range: `bytes=${ranges.map(r => `${r[0]}-${r[1]}`).join(', ')}` }
     })
     assert.equal(res.status, 206)
+    assert.ok(res.body)
 
-    const contentType = res.headers.get('Content-Type')
-    assert.ok(contentType)
+    const boundary = getBoundary(res.headers)
+    assert.ok(boundary)
 
-    const boundary = contentType.replace('multipart/byteranges; boundary=', '')
-    const body = Buffer.from(await res.arrayBuffer())
-
-    const parts = ByteRanges.parse(body, boundary)
-    assert.equal(parts.length, ranges.length)
-
-    for (let i = 0; i < parts.length; i++) {
-      assert.ok(equals(parts[i].octets, value.slice(ranges[i][0], ranges[i][1] + 1)))
-    }
+    let partsCount = 0
+    await res.body
+      .pipeThrough(new MultipartByteRangeDecoder(boundary))
+      .pipeTo(new WritableStream({
+        write (part) {
+          const range = ranges[partsCount]
+          const headers = decodePartHeader(part.header)
+          assert.equal(headers.get('content-range'), `bytes ${range[0]}-${range[1]}/${value.length}`)
+          assert.deepEqual(
+            part.content,
+            value.subarray(range[0], range[1] + 1)
+          )
+          partsCount++
+        }
+      }))
+    assert.equal(partsCount, ranges.length)
   })
 }

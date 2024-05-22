@@ -9,8 +9,8 @@ dependencies:
     specifier: ^1.2.0
     version: 1.2.0
   multipart-byte-range:
-    specifier: ^2.0.2
-    version: 2.0.2
+    specifier: ^3.0.1
+    version: 3.0.1
 
 devDependencies:
   '@types/node':
@@ -19,9 +19,6 @@ devDependencies:
   buffer:
     specifier: ^6.0.3
     version: 6.0.3
-  byteranges:
-    specifier: ^1.1.0
-    version: 1.1.0
   c8:
     specifier: ^9.1.0
     version: 9.1.0
@@ -353,10 +350,6 @@ packages:
     dependencies:
       semver: 7.6.2
     dev: true
-
-  /byteranges@1.1.0:
-    resolution: {integrity: sha512-c1bjg97QZleneWOirBABMvzz4qsxb9KoIFYKilQxMovb5N5MwLHnDuVt7k98Q/kL42hI1HcgG67q7yszFZJuqA==}
-    engines: {node: '>=14'}
 
   /c8@9.1.0:
     resolution: {integrity: sha512-mBWcT5iqNir1zIkzSPyI3NCR9EZCVI3WUD+AVO17MVWTSFNyUueXE82qTeampNtTr+ilN/5Ua3j24LgbCKjDVg==}
@@ -1614,12 +1607,12 @@ packages:
 
   /multiformats@13.1.0:
     resolution: {integrity: sha512-HzdtdBwxsIkzpeXzhQ5mAhhuxcHbjEHH+JQoxt7hG/2HGFjjwyolLo7hbaexcnhoEuV4e0TNJ8kkpMjiEYY4VQ==}
-    dev: true
 
-  /multipart-byte-range@2.0.2:
-    resolution: {integrity: sha512-S1t3lY/FeYpfpVG6XD1BIRBOsGwwBXyqK/T+w9sKVNDS1OSUFxjjhTBYkRyMw2VT5oBwZInlKK58qAgB8Rcniw==}
+  /multipart-byte-range@3.0.1:
+    resolution: {integrity: sha512-+LVbrwBmkEyClExud3FSN9xZuo0ZFWJ2yg0PxJCvnwjMch2x4Q0IXkpc97rF8k17/kNG37vN82NxVgOrQ07wlg==}
     dependencies:
-      byteranges: 1.1.0
+      streamsearch-web: 1.0.0
+      uint8arraylist: 2.4.8
     dev: false
 
   /natural-compare@1.4.0:
@@ -2036,6 +2029,11 @@ packages:
       - supports-color
     dev: true
 
+  /streamsearch-web@1.0.0:
+    resolution: {integrity: sha512-KBBU/O/xSjbr1z+NPwLE9iTrE3Pc/Ue7HumjvjjP1t7oYIM35OOMYRy/lZBoIwsiSKTnQ+uF8QbaJEa7FdJIzA==}
+    engines: {node: '>=18.0.0'}
+    dev: false
+
   /string-width@4.2.3:
     resolution: {integrity: sha512-wKyQRQpjJ0sIp62ErSZdGsjMJWsap5oRNihHhu6G7JVO/9jIB6UyevL+tXuOqrng8j/cxKTWyWUwvSTriiZz/g==}
     engines: {node: '>=8'}
@@ -2215,11 +2213,16 @@ packages:
     hasBin: true
     dev: true
 
+  /uint8arraylist@2.4.8:
+    resolution: {integrity: sha512-vc1PlGOzglLF0eae1M8mLRTBivsvrGsdmJ5RbK3e+QRvRLOZfZhQROTwH/OfyF3+ZVUg9/8hE8bmKP2CvP9quQ==}
+    dependencies:
+      uint8arrays: 5.1.0
+    dev: false
+
   /uint8arrays@5.1.0:
     resolution: {integrity: sha512-vA6nFepEmlSKkMBnLBaUMVvAC4G3CTmO58C12y4sq6WPDOR7mOFYOi7GlrQ4djeSbP6JG9Pv9tJDM97PedRSww==}
     dependencies:
       multiformats: 13.1.0
-    dev: true
 
   /unbox-primitive@1.0.2:
     resolution: {integrity: sha512-61pPlCD9h51VoreyJ0BReideM3MDKMKnh6+V9L08331ipq6Q8OFXZYiqP6n/tbHx4s5I9uRhcye6BrbkizkBDw==}

@@ -1,6 +1,6 @@
 # public-bucket
 
-Server implementation of a bucket.
+Server implementation of a bucket with multipart range support.
 
 ## Contributing
 

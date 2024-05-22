@@ -25,7 +25,7 @@ export const decodeRangeHeader = (str) => {
  *
  * @param {import('multipart-byte-range').Range} range
  * @param {number} totalSize
- * @returns {import('multipart-byte-range').AbsRange}
+ * @returns {import('multipart-byte-range').AbsoluteRange}
  */
 export const resolveRange = ([first, last], totalSize) => [
   first < 0 ? totalSize + first : first,

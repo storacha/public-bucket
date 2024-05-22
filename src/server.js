@@ -1,6 +1,6 @@
 // eslint-disable-next-line
 import * as API from './api.js'
-import { MultipartByteRange } from 'multipart-byte-range'
+import { MultipartByteRangeEncoder } from 'multipart-byte-range/encoder'
 import { decodeRangeHeader, resolveRange } from './range.js'
 
 /**
@@ -94,7 +94,7 @@ const handleRange = async (bucket, key, size, range, options) => {
  * @param {{ headers?: Headers }} [options]
  */
 const handleMultipartRange = async (bucket, key, size, ranges, options) => {
-  const source = new MultipartByteRange(ranges, async range => {
+  const source = new MultipartByteRangeEncoder(ranges, async range => {
     const options = { range: { offset: range[0], length: range[1] - range[0] + 1 } }
     const object = await bucket.get(key, options)
     if (!object || !object.body) throw new Error('Object Not Found')
