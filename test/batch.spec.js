@@ -1,3 +1,4 @@
+import { webcrypto as crypto } from 'node:crypto'
 import { equals } from 'uint8arrays'
 import { Uint8ArrayList } from 'uint8arraylist'
 import { batchRanges, createBatchingByteGetter } from '../src/batch.js'
