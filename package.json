@@ -1,6 +1,6 @@
 {
   "name": "@web3-storage/public-bucket",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Server implementation of a bucket with multipart range support.",
   "main": "src/index.js",
   "type": "module",
