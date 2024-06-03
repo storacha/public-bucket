@@ -2,6 +2,7 @@
 import * as API from './api.js'
 import { MultipartByteRangeEncoder } from 'multipart-byte-range/encoder'
 import { decodeRangeHeader, resolveRange } from './range.js'
+import { createBatchingByteGetter } from './batch.js'
 
 /**
  * @param {{ bucket: API.Bucket }} model
@@ -94,12 +95,13 @@ const handleRange = async (bucket, key, size, range, options) => {
  * @param {{ headers?: Headers }} [options]
  */
 const handleMultipartRange = async (bucket, key, size, ranges, options) => {
-  const source = new MultipartByteRangeEncoder(ranges, async range => {
+  const getBytes = createBatchingByteGetter(async range => {
     const options = { range: { offset: range[0], length: range[1] - range[0] + 1 } }
     const object = await bucket.get(key, options)
     if (!object || !object.body) throw new Error('Object Not Found')
     return /** @type {ReadableStream} */ (object.body)
-  }, { totalSize: size })
+  }, ranges.map(r => resolveRange(r, size)))
+  const source = new MultipartByteRangeEncoder(ranges, getBytes, { totalSize: size })
 
   const headers = new Headers(options?.headers)
   for (const [k, v] of Object.entries(source.headers)) {
