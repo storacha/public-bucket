@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/storacha-network/public-bucket/compare/v1.1.0...v1.2.0) (2024-06-21)
+
+
+### Features
+
+* expose max batch size option ([#4](https://github.com/storacha-network/public-bucket/issues/4)) ([05617d2](https://github.com/storacha-network/public-bucket/commit/05617d260d1b0ee6af326099dbf4f8f6bd61a30a))
+
 ## [1.1.0](https://github.com/w3s-project/public-bucket/compare/v1.0.0...v1.1.0) (2024-06-03)
 
 
