@@ -4,17 +4,19 @@ import { MultipartByteRangeEncoder } from 'multipart-byte-range/encoder'
 import { decodeRangeHeader, resolveRange } from './range.js'
 import { createBatchingByteGetter } from './batch.js'
 
-/**
- * @param {{ bucket: API.Bucket }} model
- * @returns {API.Handler}
- */
-export const createHandler = ({ bucket }) => req => handler({ bucket }, req)
+export { MaxBatchSize } from './batch.js'
 
 /**
- * @param {{ bucket: API.Bucket }} model
+ * @param {{ bucket: API.Bucket } & API.HandlerOptions} model
+ * @returns {API.Handler}
+ */
+export const createHandler = model => req => handler(model, req)
+
+/**
+ * @param {{ bucket: API.Bucket } & API.HandlerOptions} model
  * @param {Request} request
  */
-export const handler = async ({ bucket }, request) => {
+export const handler = async ({ bucket, maxBatchSize }, request) => {
   const url = new URL(request.url)
   const key = url.pathname.slice(1)
 
@@ -51,7 +53,7 @@ export const handler = async ({ bucket }, request) => {
   headers.set('Vary', 'Range')
 
   if (ranges.length > 1) {
-    return handleMultipartRange(bucket, key, object.size, ranges, { headers })
+    return handleMultipartRange(bucket, key, object.size, ranges, { headers, maxBatchSize })
   } else if (ranges.length === 1) {
     return handleRange(bucket, key, object.size, ranges[0], { headers })
   }
@@ -92,7 +94,7 @@ const handleRange = async (bucket, key, size, range, options) => {
  * @param {string} key
  * @param {number} size
  * @param {import('multipart-byte-range').Range[]} ranges
- * @param {{ headers?: Headers }} [options]
+ * @param {{ headers?: Headers, maxBatchSize?: number }} [options]
  */
 const handleMultipartRange = async (bucket, key, size, ranges, options) => {
   const getBytes = createBatchingByteGetter(async range => {
@@ -100,7 +102,7 @@ const handleMultipartRange = async (bucket, key, size, ranges, options) => {
     const object = await bucket.get(key, options)
     if (!object || !object.body) throw new Error('Object Not Found')
     return /** @type {ReadableStream} */ (object.body)
-  }, ranges.map(r => resolveRange(r, size)))
+  }, ranges.map(r => resolveRange(r, size)), { maxSize: options?.maxBatchSize })
   const source = new MultipartByteRangeEncoder(ranges, getBytes, { totalSize: size })
 
   const headers = new Headers(options?.headers)
