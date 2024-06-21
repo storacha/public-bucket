@@ -1,7 +1,8 @@
 import defer from 'p-defer'
 import { Uint8ArrayList } from 'uint8arraylist'
 
-export const DefaultBatchSize = 10 * 1024 * 1024 // 10MiB
+/** The default maximum size in bytes of a batch request to the bucket (10MiB). */
+export const MaxBatchSize = 10 * 1024 * 1024
 
 /**
  * @param {import('multipart-byte-range').ByteGetter} getBytes
@@ -51,7 +52,7 @@ export const createBatchingByteGetter = (getBytes, ranges, options) => {
 export const batchRanges = (ranges, options) => {
   ranges = [...ranges].sort((a, b) => a[0] - b[0])
 
-  const maxSize = options?.maxSize ?? DefaultBatchSize
+  const maxSize = options?.maxSize ?? MaxBatchSize
   const batches = []
   /** @type {import('multipart-byte-range').AbsoluteRange[]} */
   let batch = []
