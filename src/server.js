@@ -82,7 +82,6 @@ const handleRange = async (bucket, key, range, options) => {
     if (!object) throw new NotFoundError('Object Not Found')
     return object.size
   }
-  await getTotalSize()
   const [first, last] = await resolveRange(range, getTotalSize)
   const contentLength = last - first + 1
 
@@ -119,8 +118,6 @@ const handleMultipartRange = async (bucket, key, ranges, options) => {
     totalSize = object.size
     return totalSize
   }
-  await getTotalSize()
-
   const resolvedRanges = await Promise.all(ranges.map(r => resolveRange(r, getTotalSize)))
 
   const getBytes = createBatchingByteGetter(async range => {
