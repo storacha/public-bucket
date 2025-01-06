@@ -93,7 +93,7 @@ export const test = {
         write (part) {
           const range = ranges[partsCount]
           const headers = decodePartHeader(part.header)
-          assert.equal(headers.get('content-range'), `bytes ${range[0]}-${range[1]}/${value.length}`)
+          assert.equal(headers.get('content-range'), `bytes ${range[0]}-${range[1]}/*`)
           assert.deepEqual(
             part.content,
             value.subarray(range[0], range[1] + 1)
