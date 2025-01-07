@@ -1,3 +1,4 @@
+import { context, SpanStatusCode, trace } from '@opentelemetry/api'
 import defer from 'p-defer'
 import { Uint8ArrayList } from 'uint8arraylist'
 
@@ -26,24 +27,89 @@ export const createBatchingByteGetter = (getBytes, ranges, options) => {
       requests[r.toString()] = defer()
     }
 
-    const offset = batch[0][0]
-    const source = await getBytes([offset, batch[batch.length - 1][1]])
-
-    const buffer = new Uint8ArrayList()
-    await source.pipeTo(new WritableStream({ write: chunk => { buffer.append(chunk) } }))
-
-    for (const r of batch) {
-      requests[r.toString()].resolve(new ReadableStream({
-        pull (controller) {
-          controller.enqueue(buffer.subarray(r[0] - offset, (r[1] + 1) - offset))
-          controller.close()
-        }
-      }))
-    }
-
+    const source = await getBytes([batch[0][0], batch[batch.length - 1][1]])
+    consumeSource(source, batch, requests)
     return requests[range.toString()].promise
   }
 }
+
+/**
+ * @template {unknown[]} A
+ * @template {*} T
+ * @template {*} This
+ * @param {string} spanName
+ * @param {(this: This, ...args: A) => Promise<T>} fn
+ * @param {This} [thisParam]
+ */
+export const withSimpleSpan = (spanName, fn, thisParam) =>
+  /**
+   * @param {A} args
+  */
+  async (...args) => {
+    const tracer = trace.getTracer('public-bucket')
+    const span = tracer.startSpan(spanName)
+    const ctx = trace.setSpan(context.active(), span)
+
+    try {
+      const result = await context.with(ctx, fn, thisParam, ...args)
+      span.setStatus({ code: SpanStatusCode.OK })
+      span.end()
+      return result
+    } catch (err) {
+      if (err instanceof Error) {
+        span.setStatus({
+          code: SpanStatusCode.ERROR,
+          message: err.message
+        })
+      } else {
+        span.setStatus({
+          code: SpanStatusCode.ERROR
+        })
+      }
+      span.end()
+      throw err
+    }
+  }
+
+const consumeSource = withSimpleSpan('consumeSource',
+  /**
+ *
+ * @param {ReadableStream<Uint8Array>} source
+ * @param {import('multipart-byte-range').AbsoluteRange[]} ranges
+ * @param {Record<string, import('p-defer').DeferredPromise<ReadableStream<Uint8Array>>>} requests
+ */
+  async (source, ranges, requests) => {
+    const parts = new Uint8ArrayList()
+    // start at first byte of first blob
+    let farthestRead = ranges[0][0]
+    const offset = ranges[0][0]
+    let currentRange = 0
+    for await (const chunk of source) {
+    // append the chunk to our buffer
+      parts.append(chunk)
+      // update the absolute position of how far we've read
+      farthestRead += chunk.byteLength
+      // resolve any blobs in the current buffer
+      // note that as long as blobs are sorted ascending by start
+      // this should be resilient to overlapping ranges
+      while (farthestRead >= ranges[currentRange][1] + 1) {
+        const start = ranges[currentRange][0] - offset
+        const end = ranges[currentRange][1] + 1 - offset
+        // generate blob out of the current buffer
+        requests[ranges[currentRange].toString()].resolve(new ReadableStream({
+          pull (controller) {
+            controller.enqueue(parts.subarray(start, end))
+            controller.close()
+          }
+        }))
+        currentRange++
+        if (currentRange >= ranges.length) {
+          return
+        }
+      }
+    }
+    throw new Error('did not consume all parts')
+  }, null)
 
 /**
  * @param {import('multipart-byte-range').AbsoluteRange[]} ranges
