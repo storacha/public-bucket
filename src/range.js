@@ -24,10 +24,16 @@ export const decodeRangeHeader = (str) => {
  * Resolve a range to an absolute range.
  *
  * @param {import('multipart-byte-range').Range} range
- * @param {number} totalSize
- * @returns {import('multipart-byte-range').AbsoluteRange}
+ * @param {() => Promise<number>} getTotalSize
+ * @returns {Promise<import('multipart-byte-range').AbsoluteRange>}
  */
-export const resolveRange = ([first, last], totalSize) => [
-  first < 0 ? totalSize + first : first,
-  last ?? totalSize - 1
-]
+export const resolveRange = async ([first, last], getTotalSize) => {
+  let totalSize = 0
+  if (first < 0 || last == null) {
+    totalSize = await getTotalSize()
+  }
+  return [
+    first < 0 ? totalSize + first : first,
+    last ?? totalSize - 1
+  ]
+}
