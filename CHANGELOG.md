@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/storacha/public-bucket/compare/v1.2.0...v1.3.0) (2025-01-07)
+
+
+### Features
+
+* avoid head request unless necessary ([#6](https://github.com/storacha/public-bucket/issues/6)) ([1e581ac](https://github.com/storacha/public-bucket/commit/1e581aced25e2f13da1ef6ac1872925da179bddc))
+
 ## [1.2.0](https://github.com/storacha-network/public-bucket/compare/v1.1.0...v1.2.0) (2024-06-21)
 
 
