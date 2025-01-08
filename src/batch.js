@@ -82,7 +82,7 @@ const consumeSource = withSimpleSpan('consumeSource',
     const parts = new Uint8ArrayList()
     // start at first byte of first blob
     let farthestRead = ranges[0][0]
-    const offset = ranges[0][0]
+    let farthestConsumed = ranges[0][0]
     let currentRange = 0
     for await (const chunk of source) {
     // append the chunk to our buffer
@@ -93,12 +93,11 @@ const consumeSource = withSimpleSpan('consumeSource',
       // note that as long as blobs are sorted ascending by start
       // this should be resilient to overlapping ranges
       while (farthestRead >= ranges[currentRange][1] + 1) {
-        const start = ranges[currentRange][0] - offset
-        const end = ranges[currentRange][1] + 1 - offset
+        const part = parts.subarray(ranges[currentRange][0] - farthestConsumed, ranges[currentRange][1] + 1 - farthestConsumed)
         // generate blob out of the current buffer
         requests[ranges[currentRange].toString()].resolve(new ReadableStream({
           pull (controller) {
-            controller.enqueue(parts.subarray(start, end))
+            controller.enqueue(part)
             controller.close()
           }
         }))
@@ -106,6 +105,12 @@ const consumeSource = withSimpleSpan('consumeSource',
         if (currentRange >= ranges.length) {
           return
         }
+        // consume any bytes we no longer need
+        // (they are before the beginning of the current range)
+        let toConsume = ranges[currentRange][0] - farthestConsumed
+        if (toConsume > parts.byteLength) { toConsume = parts.byteLength }
+        parts.consume(toConsume)
+        farthestConsumed += toConsume
       }
     }
     throw new Error('did not consume all parts')
