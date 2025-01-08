@@ -44,7 +44,7 @@
     "c8": "^9.1.0",
     "entail": "^2.1.2",
     "standard": "^17.1.0",
-    "typescript": "^5.4.5",
+    "typescript": "^5.7.2",
     "uint8arrays": "^5.1.0"
   },
   "repository": {
