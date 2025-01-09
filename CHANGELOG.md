@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.4.0](https://github.com/storacha/public-bucket/compare/v1.3.0...v1.4.0) (2025-01-08)
+
+
+### Features
+
+* **batch:** do not block batch fetch for last part ([aff7032](https://github.com/storacha/public-bucket/commit/aff7032e6d6932367f21790a73d3a0f31f0b7cf3))
+
+
+### Bug Fixes
+
+* **deps:** update typescript ([8cdafaf](https://github.com/storacha/public-bucket/commit/8cdafaf0bfaf19ce8391204942285a5da7a2ad56))
+
 ## [1.3.0](https://github.com/storacha/public-bucket/compare/v1.2.0...v1.3.0) (2025-01-07)
 
 
